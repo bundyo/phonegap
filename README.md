@@ -34,6 +34,7 @@ Directory Structure
     Android .............. PhoneGap for Android
     BlackBerry ........... PhoneGap for BlackBerry 5.0+
     Documentation ........ PhoneGap API Documentation
+    Harmattan ............ PhoneGap for MeeGo-Harmattan (Nokia N9/N950)
     Symbian .............. PhoneGap for Symbian
     iOS .................. PhoneGap for iOS
     webOS ................ PhoneGap for Palm
