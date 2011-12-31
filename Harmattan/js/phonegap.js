@@ -731,7 +731,7 @@ var PhoneGap = PhoneGap || (function() {
         this.platform = GapDeviceInfo.platform;
         this.uuid = GapDeviceInfo.uuid;
         this.version = GapDeviceInfo.version;
-        this.phonegap = '1.2.0';
+        this.phonegap = '1.3.0';
     };
 
     /**

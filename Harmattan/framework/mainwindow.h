@@ -1,7 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "webview.h"
+//#include "webview.h"
+#include "declarativewebview/qdeclarativewebview_p.h"
 
 #include <QMainWindow>
 #include <QDeclarativeItem>
@@ -12,16 +13,8 @@
 extern QDeclarativeItem *QMLDialog;
 extern QDeclarativeItem *QMLGallery;
 extern QGraphicsView *QMLView;
-extern WebView *webView;
+extern QDeclarativeItem *QMLWebView;
 extern bool portrait;
-
-enum ScreenOrientation
-{
-    Landscape = 0,
-    Portrait = 270,
-    LandscapeInverted = 180,
-    PortraitInverted = 90
-};
 
 class Notifier: public QObject
 {
@@ -35,9 +28,6 @@ class Notifier: public QObject
         Q_INVOKABLE void orientationChangeStarting(bool inPortrait);
         Q_INVOKABLE void orientationChangeStarted(bool inPortrait);
         Q_INVOKABLE void orientationChangeFinished(bool inPortrait);
-
-    private slots:
-        void animationFinished();
 
     signals:
         void callBack(const bool &result);

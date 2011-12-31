@@ -114,9 +114,7 @@ void Camera::takePicture(int quality, int destinationType, int sourceType, int t
         qDebug() << "Camera::takePicture: Show Gallery";
         if (QMLGallery) {
             QMLGallery->setProperty( "camera", sourceType == PHOTOLIBRARY ? false : true );
-            QMLView->show();
-            QMLGallery->setProperty( "shown", true );
-            QMLDialog->setProperty( "shown", false );
+            QMetaObject::invokeMethod(QMLGallery, "open");
         }
     }
 }

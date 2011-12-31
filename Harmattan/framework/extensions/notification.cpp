@@ -35,9 +35,6 @@ void Notification::vibrate(int duration, int intensity) {
 
 void Notification::alert(QString message, QString title = "Alert", QString buttonName = "Ok") {
     if (QMLDialog) {
-        QMLView->show();
-        QMLGallery->setProperty( "shown", false );
-        QMLDialog->setProperty( "shown", true );
         QMLDialog->setProperty( "titleText", title );
         QMLDialog->setProperty( "contentText", message );
         QMLDialog->setProperty( "button1Visible", true );
@@ -50,9 +47,6 @@ void Notification::alert(QString message, QString title = "Alert", QString butto
 void Notification::confirm(QString message, QString title = "Confirm", QString buttonNames = "Ok,Cancel") {
     if (QMLDialog) {
         QStringList names = buttonNames.split(",");
-        QMLView->show();
-        QMLGallery->setProperty( "shown", false );
-        QMLDialog->setProperty( "shown", true );
         QMLDialog->setProperty( "titleText", title );
         QMLDialog->setProperty( "contentText", message );
         QMLDialog->setProperty( "button1Visible", true );

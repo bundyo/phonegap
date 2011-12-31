@@ -21,7 +21,6 @@ WebPage::WebPage(QObject *parent) :
 
 void WebPage::javaScriptAlert(QWebFrame *originatingFrame, const QString& message) {
     if (QMLDialog) {
-        QMLView->show();
         QMLDialog->setProperty( "titleText", "Alert" );
         QMLDialog->setProperty( "contentText", message );
         QMLDialog->setProperty( "button1Text", "Ok" );
@@ -32,7 +31,6 @@ void WebPage::javaScriptAlert(QWebFrame *originatingFrame, const QString& messag
 
 bool WebPage::javaScriptConfirm(QWebFrame *originatingFrame, const QString& message) {
     if (QMLDialog) {
-        QMLView->show();
         QMLDialog->setProperty( "titleText", "Confirm" );
         QMLDialog->setProperty( "contentText", message );
         QMLDialog->setProperty( "button1Text", "Ok" );
@@ -56,24 +54,24 @@ QString WebPage::userAgentForUrl ( const QUrl & url ) const {
 }
 
 void WebPage::viewportChangeRequested() {
-    qreal pixelScale = 1.0;
+//    qreal pixelScale = 1.0;
 
-    QSize viewportSize = QSize(defaultWidth, defaultHeight);
+//    QSize viewportSize = QSize(defaultWidth, defaultHeight);
 
-    QWebPage::ViewportAttributes hints = ViewportAttributes();
+//    QWebPage::ViewportAttributes hints = ViewportAttributes();
 
-    if (hints.size().width() > 0)
-        viewportSize.setWidth(hints.size().width());
-    if (hints.size().height() > 0)
-        viewportSize.setHeight(hints.size().height());
+//    if (hints.size().width() > 0)
+//        viewportSize.setWidth(hints.size().width());
+//    if (hints.size().height() > 0)
+//        viewportSize.setHeight(hints.size().height());
 
-    setPreferredContentsSize(viewportSize / pixelScale);
+//    setPreferredContentsSize(viewportSize / pixelScale);
 
-    if (hints.initialScaleFactor() > 0) {
-        webView->setZoomScale(hints.initialScaleFactor() * pixelScale);
-    } else {
-        webView->setZoomScale(1.0 * pixelScale);
-    }
+//    if (hints.initialScaleFactor() > 0) {
+//        ((QDeclarativeWebView*) QMLWebView)->setZoomScale(hints.initialScaleFactor() * pixelScale);
+//    } else {
+//        ((QDeclarativeWebView*) QMLWebView)->setZoomScale(1.0 * pixelScale);
+//    }
 
 }
 

@@ -11,7 +11,7 @@
 #include <QWebFrame>
 
 
-Extensions::Extensions(QGraphicsWebView *webView) :
+Extensions::Extensions(QDeclarativeWebView *webView) :
     QObject(webView) {
 
     m_frame = webView->page()->mainFrame();

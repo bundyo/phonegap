@@ -14,7 +14,6 @@
 #include <QDeclarativeEngine>
 #include <QWebSettings>
 #include <QWebFrame>
-#include <QGraphicsWebView>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 
@@ -27,68 +26,26 @@
 QDeclarativeItem *QMLDialog;
 QDeclarativeItem *QMLGallery;
 QGraphicsView *QMLView;
+QDeclarativeItem *QMLWebView;
 Notifier *notifier;
-WebView *webView;
 bool portrait;
-
-static void writeX11OrientationAngleProperty(QWidget* widget, ScreenOrientation orientation = Portrait)
-{
-#ifdef Q_WS_X11
-    if (widget) {
-        WId id = widget->winId();
-        Display *display = QX11Info::display();
-        if (!display) return;
-        Atom orientationAngleAtom = XInternAtom(display, "_MEEGOTOUCH_ORIENTATION_ANGLE", False);
-        XChangeProperty(display, id, orientationAngleAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&orientation, 1);
-    }
-#endif
-}
 
 void Notifier::hideView(bool result) {
     qDebug() << QMLDialog->property("titleText");
-    QMLView->hide();
+    QMetaObject::invokeMethod(QMLDialog, "close");
 
 //    emit callBack(result);
 }
 
 void Notifier::hideGallery(QString url) {
     qDebug() << url;
-    QMLView->hide();
+    QMetaObject::invokeMethod(QMLGallery, "close");
 
     emit pictureChosen("still-capture", url);
 }
 
 void Notifier::orientationChangeStarting(bool inPortrait) {
     qDebug() << "orientation change starting";
-
-    webView->setFrozen(true);
-
-    QPropertyAnimation *animation = new QPropertyAnimation(mainWindow, "rotationAngle");
-    animation->setDuration(0);                      // Set to number of milliseconds to enable animation. However, its rather choppy.
-    animation->setStartValue(inPortrait ? -90 : 0);
-    animation->setEndValue(inPortrait ? 0 : -90);
-    QObject::connect(animation, SIGNAL(finished()), this, SLOT(animationFinished()));
-
-    portrait = !inPortrait;
-    mainWindow->setTransformationAnchor(QGraphicsView::NoAnchor);
-
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void Notifier::animationFinished() {
-    if (portrait) {
-        writeX11OrientationAngleProperty(mainWindow, Portrait);
-        webView->setGeometry(QRectF(0,0,480,854));
-    } else {
-        writeX11OrientationAngleProperty(mainWindow, Landscape);
-        webView->setGeometry(QRectF(0,0,854,480));
-    }
-
-    webView->setFrozen(false);
-
-    // Force WebKit redraw due to artifacts. I really hope there's a better way.
-    webView->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitTransform = 'scale(1)';");
-    webView->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitTransform = 'none';");
 }
 
 void Notifier::orientationChangeStarted(bool inPortrait) {
@@ -120,45 +77,31 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
 
     QGraphicsScene *scene = new QGraphicsScene;
     QDeclarativeEngine *engine = new QDeclarativeEngine;
-    QDeclarativeComponent component(engine, QUrl::fromLocalFile(QApplication::applicationDirPath() + QLatin1String("/../qml/empty.qml")));
+    QDeclarativeComponent component(engine, QUrl::fromLocalFile(QApplication::applicationDirPath() + QLatin1String("/../qml/browser.qml")));
+    qDebug() << component.errors();
 
     notifier = new Notifier();
     QObject *comp = component.create();
     QMLDialog = comp->findChild<QDeclarativeItem*>("dialog");
     QMLGallery = comp->findChild<QDeclarativeItem*>("gallery");
+    QMLWebView = comp->findChild<QDeclarativeItem*>("webView");
     engine->rootContext()->setContextProperty("notifier", notifier);
 
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
-    webView = new WebView();
-    webView->setPage(new WebPage());
-    webView->setGeometry(QRectF(0,0,854,480));
+    ((QDeclarativeWebView*) QMLWebView)->setPage(new WebPage());
+    ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+    ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageDatabaseEnabled, true);
+    ((QDeclarativeWebView*) QMLWebView)->settings()->enablePersistentStorage();
+    QMLWebView->setProperty("pageUrl", "../app/index.html");
 
-    portrait = !QMLDialog->property("inPortrait").toBool();
-
-    webView->page()->settings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
-    webView->page()->settings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
-    webView->page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
-    webView->page()->settings()->setAttribute(QWebSettings::LocalStorageDatabaseEnabled, true);
-    webView->page()->settings()->setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
-    webView->page()->settings()->setAttribute(QWebSettings::DnsPrefetchEnabled, true);
-    webView->page()->settings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
-    webView->page()->settings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, true);
-    webView->settings()->enablePersistentStorage();
-    webView->load(QUrl::fromUserInput(templateDir.filePath("index.html")));
-    webView->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
-    webView->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
-
-    mainScene->addItem(webView);
-    mainScene->setActiveWindow(webView);
-
-    new Extensions(webView);
+    new Extensions(((QDeclarativeWebView*) QMLWebView));
 
     scene->addItem(qobject_cast<QGraphicsItem*>(comp));
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    scene->setSceneRect(0,0,width(),height());
 
     QMLView = new QGraphicsView( this );
     QMLView->setScene( scene );
-    QMLView->resize(width(),height());
+    QMLView->setGeometry(0,0,width(),height());
     QMLView->setStyleSheet( "background: transparent; border: none;" );
     QMLView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     QMLView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
@@ -167,7 +110,9 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
     QMLView->setCacheMode( QGraphicsView::CacheBackground );
     QMLView->setFrameShape(QFrame::NoFrame);
 
-    webView->page()->mainFrame()->evaluateJavaScript("window._nativeReady = true"); // Tell PhoneGap that init is complete.
+    QMLView->show();
+
+    ((QDeclarativeWebView*) QMLWebView)->page()->mainFrame()->evaluateJavaScript("window._nativeReady = true"); // Tell PhoneGap that init is complete.
 }
 
 MainWindow::~MainWindow() {

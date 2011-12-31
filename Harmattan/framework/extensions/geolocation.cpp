@@ -86,11 +86,11 @@ void Geolocation::stop() {
 }
 
 void Geolocation::emitError(int code, const QString &message) {
-    webView->page()->mainFrame()->evaluateJavaScript("var listeners = navigator._geo.listeners; for (var idx in listeners) { if ('fail' in listeners[idx]) { listeners[idx].fail({ code: '" + ((QString) code) + "', message: '" + message + "' }); }} delete navigator._geo.listeners['global'];" );
+    ((QDeclarativeWebView*) QMLWebView)->page()->mainFrame()->evaluateJavaScript("var listeners = navigator._geo.listeners; for (var idx in listeners) { if ('fail' in listeners[idx]) { listeners[idx].fail({ code: '" + ((QString) code) + "', message: '" + message + "' }); }} delete navigator._geo.listeners['global'];" );
 }
 
 void Geolocation::onPositionUpdated(const QGeoPositionInfo &info) {
-    webView->page()->mainFrame()->evaluateJavaScript("var listeners = navigator._geo.listeners; for (var idx in listeners) { if ('success' in listeners[idx]) { listeners[idx].success(" + getPositionFromInfo(info) + "); }} delete navigator._geo.listeners['global'];");
+    ((QDeclarativeWebView*) QMLWebView)->page()->mainFrame()->evaluateJavaScript("var listeners = navigator._geo.listeners; for (var idx in listeners) { if ('success' in listeners[idx]) { listeners[idx].success(" + getPositionFromInfo(info) + "); }} delete navigator._geo.listeners['global'];");
 }
 
 void Geolocation::onUpdateTimeout() {

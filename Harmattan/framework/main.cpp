@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 
 #include <QDir>
-#include <QGraphicsWebView>
+//#include <QGraphicsWebView>
 
 MainWindow *mainWindow;
 
@@ -19,6 +19,5 @@ int main(int argc, char *argv[]) {
 
     mainWindow = new MainWindow();
     mainWindow->showFullScreen();
-    notifier->orientationChangeStarting(portrait);
     return app.exec();
 }

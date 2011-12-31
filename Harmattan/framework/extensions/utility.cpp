@@ -14,7 +14,6 @@ void Utility::loadUrl(QString url, QString loadingDialog, bool clearHistory, boo
         QStringList names = loadingDialog.split(",");
 
         if (QMLDialog) {
-            QMLView->show();
             QMLDialog->setProperty( "titleText", names[0] );
             QMLDialog->setProperty( "contentText", names[1] );
             QMLDialog->setProperty( "button1Visible", false );
@@ -24,27 +23,27 @@ void Utility::loadUrl(QString url, QString loadingDialog, bool clearHistory, boo
     }
 
     if (clearHistory)
-        webView->history()->clear();
+        ((QDeclarativeWebView*) QMLWebView)->history()->clear();
 
-    webView->setUrl(QUrl::fromUserInput(url));
+    ((QDeclarativeWebView*) QMLWebView)->setUrl(QUrl::fromUserInput(url));
 }
 
 void Utility::cancelLoadUrl() {
-    webView->stop();
+    QMetaObject::invokeMethod(QMLWebView, "stop");
 }
 
 void Utility::clearCache() {
-    webView->page()->networkAccessManager()->cache()->clear();
+    ((QDeclarativeWebView*) QMLWebView)->page()->networkAccessManager()->cache()->clear();
 }
 
 void Utility::clearHistory() {
 
-    webView->history()->clear();
+    ((QDeclarativeWebView*) QMLWebView)->history()->clear();
 }
 
 void Utility::backHistory() {
 
-    webView->back();
+    ((QDeclarativeWebView*) QMLWebView)->history()->back();
 }
 
 void Utility::exit() {

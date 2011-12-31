@@ -22,11 +22,13 @@ SOURCES += \
     extensions/hash.cpp \
     extensions/notification.cpp \
     extensions/utility.cpp \
-    webview.cpp \
-    scrollbar.cpp \
-    kineticscroll.cpp \
     extensions/compass.cpp \
-    extensions/camera.cpp
+    extensions/camera.cpp \
+    declarativewebview/qdeclarativewebview.cpp \
+    declarativewebview/plugin.cpp
+#    webview.cpp \
+#    scrollbar.cpp \
+#    kineticscroll.cpp \
 
 HEADERS += \
     cookiejar.h \
@@ -41,11 +43,12 @@ HEADERS += \
     extensions/notification.h \
     extensions/utility.h \
     main.h \
-    webview.h \
-    scrollbar.h \
-    kineticscroll.h \
     extensions/compass.h \
-    extensions/camera.h
+    extensions/camera.h \
+    declarativewebview/qdeclarativewebview_p.h
+#    webview.h \
+#    scrollbar.h \
+#    kineticscroll.h \
 
 CONFIG += mobility camerainterface-maemo-meegotouch #qtdbus qdeclarative-boostable
 MOBILITY = location sensors systeminfo feedback contacts messaging multimedia gallery
