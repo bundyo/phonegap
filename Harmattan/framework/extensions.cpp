@@ -2,6 +2,7 @@
 #include "extensions/accelerometer.h"
 #include "extensions/camera.h"
 #include "extensions/compass.h"
+#include "extensions/contacts.h"
 #include "extensions/deviceinfo.h"
 #include "extensions/geolocation.h"
 #include "extensions/hash.h"
@@ -21,6 +22,7 @@ Extensions::Extensions(QDeclarativeWebView *webView) :
     m_extensions["GapNotification"] = new Notification(this);
     m_extensions["GapGeolocation"] = new Geolocation(this);
     m_extensions["GapDeviceInfo"] = new DeviceInfo(this);
+    m_extensions["GapContacts"] = new Contacts(this);
     m_extensions["GapUtility"] = new Utility(this);
     m_extensions["GapCompass"] = new Compass(this);
     m_extensions["GapCamera"] = new Camera(this);

@@ -431,7 +431,7 @@
 		obj.filter = "";
 		obj.multiple = true;
 		obj.limit = 1000;
-		navigator.service.contacts.find(
+        navigator.contacts.find(
 			["displayName", "name", "phoneNumbers", "emails", "urls", "note"],
         	function(contacts) {
 				var s = "";
@@ -1052,12 +1052,12 @@
     <a href="javascript:" class="btn large" onclick="getImage();">Select Image from Library</a>
 
 	<!-- Contacts -->
-<!--	<div id="info">
+    <div id="info">
 		<h2>Contacts</h2>
 		<b>Results:<b><br>
 		<span id="contacts_results">&nbsp;</span>
 	</div>
-    <a href="javascript:" class="btn large" onclick="getContacts();">Get phone's contacts</a>-->
+    <a href="javascript:" class="btn large" onclick="getContacts();">Get phone's contacts</a>
 
 	<!-- Audio -->
 <!--	<div id="info">

@@ -25,10 +25,8 @@ SOURCES += \
     extensions/compass.cpp \
     extensions/camera.cpp \
     declarativewebview/qdeclarativewebview.cpp \
-    declarativewebview/plugin.cpp
-#    webview.cpp \
-#    scrollbar.cpp \
-#    kineticscroll.cpp \
+    declarativewebview/plugin.cpp \
+    extensions/contacts.cpp
 
 HEADERS += \
     cookiejar.h \
@@ -45,13 +43,12 @@ HEADERS += \
     main.h \
     extensions/compass.h \
     extensions/camera.h \
-    declarativewebview/qdeclarativewebview_p.h
-#    webview.h \
-#    scrollbar.h \
-#    kineticscroll.h \
+    declarativewebview/qdeclarativewebview_p.h \
+    extensions/contacts.h
 
 CONFIG += mobility camerainterface-maemo-meegotouch #qtdbus qdeclarative-boostable
 MOBILITY = location sensors systeminfo feedback contacts messaging multimedia gallery
+#LIBS += -lqjson
 
 contains(MEEGO_EDITION,harmattan) {
 
