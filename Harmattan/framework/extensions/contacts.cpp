@@ -53,24 +53,20 @@ QVariantMap Contacts::findContacts(QVariantMap fields, QString filter, bool mult
 
     QContactIntersectionFilter currentFilter = QContactIntersectionFilter();
 
-    QContactUnionFilter nameFilter;
-    QStringList nameFields;
-    nameFields << QContactName::FieldCustomLabel;
-    nameFields << QContactName::FieldFirstName;
-    nameFields << QContactName::FieldLastName;
-    nameFields << QContactName::FieldMiddleName;
-    nameFields << QContactName::FieldPrefix;
-    nameFields << QContactName::FieldSuffix;
-    foreach (const QString& fieldName, nameFields) {
-        QContactDetailFilter subFilter;
-        subFilter.setDetailDefinitionName(QContactName::DefinitionName, fieldName);
-        subFilter.setValue("test");
-        subFilter.setMatchFlags(QContactFilter::MatchContains);
-        nameFilter.append(subFilter);
+    foreach( const QVariant current, fields ) {
+        QContactUnionFilter detailFilter;
+        QVariantMap map = current.toMap();
+        foreach( const QVariant field, map.value("fields").toList() ) {
+            QContactDetailFilter subFilter;
+            subFilter.setDetailDefinitionName(map.value("name").toString(), field.toString());
+            subFilter.setValue(filter);
+            subFilter.setMatchFlags(QContactFilter::MatchContains);
+            detailFilter.append(subFilter);
+        }
+        currentFilter.append(detailFilter);
     }
-    currentFilter.append(nameFilter);
 
-    qDebug() << fields;
+    qDebug() << currentFilter;
 
 //    QList<QContact> result = m_contacts->contacts(currentFilter);
 
