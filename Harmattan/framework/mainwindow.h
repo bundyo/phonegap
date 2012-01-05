@@ -40,17 +40,10 @@ class MainWindow : public QGraphicsView {
 
     Q_OBJECT
 
-        Q_PROPERTY(qreal rotationAngle READ rotationAngle WRITE setRotationAngle)
-
     public:
         explicit MainWindow(QGraphicsScene *parent = 0);
         virtual ~MainWindow();
 
-        void setRotationAngle(qreal angle);
-        qreal rotationAngle() const;
-
-    private:
-        qreal m_rotationAngle;
 };
 
 #endif // MAINWINDOW_H

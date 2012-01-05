@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 
 #include <QDir>
-//#include <QGraphicsWebView>
 
 MainWindow *mainWindow;
 

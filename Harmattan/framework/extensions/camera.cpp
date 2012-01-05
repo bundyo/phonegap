@@ -10,7 +10,6 @@
 
 #include <QDebug>
 
-//#include <QtDBus/QtDBus>
 #include <QBuffer>
 #include <QFile>
 #include <QImage>

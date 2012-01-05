@@ -8,9 +8,6 @@
 #include <QString>
 #include <QFileInfo>
 
-const int defaultWidth = 854;
-const int defaultHeight = 800;
-
 WebPage::WebPage(QObject *parent) :
     QWebPage(parent) {
 
@@ -53,31 +50,9 @@ QString WebPage::userAgentForUrl ( const QUrl & url ) const {
     return "Mozilla/5.0 (MeeGo; NokiaN9; PhoneGap) AppleWebKit/534.13 (KHTML, like Gecko) NokiaBrowser/8.5.0 Mobile Safari/534.13";
 }
 
-void WebPage::viewportChangeRequested() {
-//    qreal pixelScale = 1.0;
-
-//    QSize viewportSize = QSize(defaultWidth, defaultHeight);
-
-//    QWebPage::ViewportAttributes hints = ViewportAttributes();
-
-//    if (hints.size().width() > 0)
-//        viewportSize.setWidth(hints.size().width());
-//    if (hints.size().height() > 0)
-//        viewportSize.setHeight(hints.size().height());
-
-//    setPreferredContentsSize(viewportSize / pixelScale);
-
-//    if (hints.initialScaleFactor() > 0) {
-//        ((QDeclarativeWebView*) QMLWebView)->setZoomScale(hints.initialScaleFactor() * pixelScale);
-//    } else {
-//        ((QDeclarativeWebView*) QMLWebView)->setZoomScale(1.0 * pixelScale);
-//    }
-
-}
-
 void WebPage::loadFinished(bool ok) {
 
-    if (!ok) {
-        QMessageBox::warning(0, "Error", "There was an error loading the page " + mainFrame()->url().toString());
-    }
+//    if (!ok) {
+//        QMessageBox::warning(0, "Error", "There was an error loading the page " + mainFrame()->url().toString());
+//    }
 }

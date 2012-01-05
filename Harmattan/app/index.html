@@ -267,8 +267,8 @@
 	 * Check network status
 	 */
 	 var isReachable = function() {
-                document.getElementById('reachable_status').innerHTML = "Retrieving...";
-                navigator.network.isReachable("phonegap.com",
+            document.getElementById('reachable_status').innerHTML = "Retrieving...";
+            navigator.network.isReachable("phonegap.com",
 
 			// Success callback
 			function(reachability) {
@@ -428,7 +428,7 @@
 
     function getContacts() {
 		obj = new ContactFindOptions();
-		obj.filter = "";
+        obj.filter = "un";
 		obj.multiple = true;
 		obj.limit = 1000;
         navigator.contacts.find(

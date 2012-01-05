@@ -40,8 +40,8 @@ const QString &DeviceInfo::version() const {
 const QString &DeviceInfo::network() const {
 
     QNetworkConfigurationManager manager;
-    QSystemNetworkInfo* networkInfo = new QSystemNetworkInfo();
-    QSystemNetworkInfo::NetworkMode networkMode = networkInfo->currentMode();
+    QSystemNetworkInfo networkInfo;
+    QSystemNetworkInfo::NetworkMode networkMode = networkInfo.currentMode();
     qDebug() << ""; // WTF! Remove this and get a segfault.
 
     if (!manager.isOnline()) // Seems there is no reliable way to detect if a 3G data connection is active, so ruling it out early.
@@ -60,7 +60,7 @@ const QString &DeviceInfo::network() const {
         case QSystemNetworkInfo::UnknownMode:
             return "unknown";
         default:
-            QSystemNetworkInfo::CellDataTechnology cell = networkInfo->cellDataTechnology();
+            QSystemNetworkInfo::CellDataTechnology cell = networkInfo.cellDataTechnology();
             switch (cell) {
                 case QSystemNetworkInfo::GprsDataTechnology:
                 case QSystemNetworkInfo::EdgeDataTechnology:

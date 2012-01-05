@@ -28,7 +28,6 @@ QDeclarativeItem *QMLGallery;
 QGraphicsView *QMLView;
 QDeclarativeItem *QMLWebView;
 Notifier *notifier;
-bool portrait;
 
 void Notifier::hideView(bool result) {
     qDebug() << QMLDialog->property("titleText");
@@ -110,25 +109,10 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
     QMLView->setCacheMode( QGraphicsView::CacheBackground );
     QMLView->setFrameShape(QFrame::NoFrame);
 
-    QMLView->show();
+//    QMLView->show();
 
     ((QDeclarativeWebView*) QMLWebView)->page()->mainFrame()->evaluateJavaScript("window._nativeReady = true"); // Tell PhoneGap that init is complete.
 }
 
 MainWindow::~MainWindow() {
-}
-
-qreal MainWindow::rotationAngle() const
-{
-    return m_rotationAngle;
-}
-
-void MainWindow::setRotationAngle(qreal angle)
-{
-    if (m_rotationAngle != angle) {
-        m_rotationAngle = angle;
-        QTransform t;
-        t.rotate(m_rotationAngle, Qt::ZAxis);
-        setTransform(t);
-    }
 }
