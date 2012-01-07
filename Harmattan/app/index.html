@@ -443,8 +443,7 @@
 					for (var i=0; i<contacts.length; i++) {
 						var contact = contacts[i];
 
-                        console.log(JSON.stringify(contact));
-                        s = s + "<tr><td>" + contact.name + "</td><td>";
+                        s = s + "<tr><td>" + contact.name.formatted + "</td><td>";
 						if (contact.phoneNumbers.length > 0) {
                             s = s + contact.phoneNumbers[0].value;
 						}
@@ -1059,7 +1058,7 @@
 		<b>Results:<b><br>
 		<span id="contacts_results">&nbsp;</span>
 	</div>
-    <a href="javascript:" class="btn large" onclick="getContacts('un', true);">Get phone's contacts</a>
+    <a href="javascript:" class="btn large" onclick="getContacts('', true);">Get phone's contacts</a>
 
 	<!-- Audio -->
 <!--	<div id="info">

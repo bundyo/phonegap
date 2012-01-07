@@ -28,13 +28,17 @@ QVariantList Contacts::findContacts(QVariantMap fields, QString filter, bool mul
     foreach( const QVariant current, fields ) {
         QContactUnionFilter detailFilter;
         QVariantMap map = current.toMap();
+        QVariantMap mapFields = map.value("fields").toMap();
 
-        foreach( const QVariant field, map.value("fields").toList() ) {
-            QContactDetailFilter subFilter;
-            subFilter.setDetailDefinitionName(map.value("name").toString(), field.toString());
-            subFilter.setValue(filter);
-            subFilter.setMatchFlags(QContactFilter::MatchContains);
-            detailFilter.append(subFilter);
+        foreach( const QVariant field, mapFields ) {
+            QString key = mapFields.key(field);
+            if ((key != "pref") && (key != "type") && (key != "formatted")) {
+                QContactDetailFilter subFilter;
+                subFilter.setDetailDefinitionName(map.value("name").toString(), field.toString());
+                subFilter.setValue(filter);
+                subFilter.setMatchFlags(QContactFilter::MatchContains);
+                detailFilter.append(subFilter);
+            }
         }
         currentFilter.append(detailFilter);
     }
@@ -49,26 +53,47 @@ QVariantList Contacts::findContacts(QVariantMap fields, QString filter, bool mul
         QVariantMap contactMap;
         foreach( const QVariant current, fields ) {
             QVariantMap map = current.toMap();
-            QStringList contactFieldList;
+            QVariantList contactFieldList;
+            QString contactField;
+            QString mapName = map.value("name").toString();
+            QVariantMap mapFields = map.value("fields").toMap();
 
-            QList<QContactDetail> details = currentContact.details(map.value("name").toString());
+            QList<QContactDetail> details = currentContact.details(mapName);
 
             foreach( const QContactDetail detail, details ) {
-                QString contactField = "";
-                foreach( const QVariant field, map.value("fields").toList() ) {
-                    contactField += detail.variantValue(field.toString()).toString() + " ";
+                if (mapFields.count() == 1) {
+                    contactField = detail.variantValue(mapFields.values().at(0).toString()).toString();
+                } else {
+                    QVariantMap contactFieldMap;
+                    foreach( const QVariant field, mapFields ) {
+                        contactFieldMap.insert(mapFields.key(field), detail.variantValue(field.toString()).toString());
+                    }
+                    if (mapFields.value("formatted").isValid()) {
+                        QStringList formatted;
+
+                        foreach( QVariant formatField, mapFields.value("formatted").toList() ) {
+                            formatted.append(contactFieldMap.value(formatField.toString()).toString());
+                        }
+
+                        contactFieldMap.insert("formatted", formatted.join(map.value("formatSeparator").toString()).trimmed());
+                    }
+                    contactFieldList.append(contactFieldMap);
                 }
-                contactFieldList.append(contactField.trimmed());
             }
 
-            if (contactFieldList.count() != 0) {
-                if (map.value("array").toBool())
-                    contactMap.insert(fields.key(current), contactFieldList);
+            QString currentField = fields.key(current);
+            if (contactFieldList.length() != 0) {
+                if (mapFields.count() != 1)
+                    if (map.value("array").toBool())
+                        contactMap.insert(currentField, contactFieldList);
+                    else
+                        contactMap.insert(currentField, contactFieldList.first());
                 else
-                    contactMap.insert(fields.key(current), contactFieldList.first());
+                    contactMap.insert(mapName, contactField);
             } else
-                contactMap.insert(fields.key(current), "");
+                contactMap.insert(currentField, "");
         }
+
         resultList.append(contactMap);
         if (!multiple && count == 1)
             break;

@@ -1764,18 +1764,6 @@ var ContactFindOptions = function(filter, multiple) {
         // find matching contacts
         // Note: the filter expression can be null here, in which case, the find won't filter
         var contacts = GapContacts.findContacts(filterFields, options.filter, options.multiple);
-//        console.log(JSON.stringify(contacts));
-
-//        // convert to Contact from blackberry.pim.Contact
-//        var contacts = [];
-//        for (var i in hContacts) {
-//            if (hContacts[i]) {
-//                // W3C Contacts API specification states that only the fields
-//                // in the search filter should be returned, so we create
-//                // a new Contact object, copying only the fields specified
-//                contacts.push(this._createContact(hContacts[i], fields));
-//            }
-//        }
 
         // return results
         if (success && success instanceof Function) {
@@ -1802,34 +1790,20 @@ var ContactFindOptions = function(filter, multiple) {
      * and 'lastName' fields.
      */
     var fieldMappings = {
-         "id"                        : { name: "Guid", fields: [ "Guid" ], array: false },
-         "displayName"               : { name: "DisplayLabel", fields: [ "Label" ], array: false },
-         "name"                      : { name: "Name", fields: [ "Prefix", "FirstName", "LastName" ], array: false },
-         "name.formatted"            : { name: "Name", fields: [ "Prefix", "FirstName", "LastName" ], array: false },
-         "name.givenName"            : { name: "Name", fields: [ "FirstName" ], array: false },
-         "name.familyName"           : { name: "Name", fields: [ "LastName" ], array: false },
-         "name.honorificPrefix"      : { name: "Name", fields: [ "Prefix" ], array: false },
-         "phoneNumbers"              : { name: "PhoneNumber", fields: [ "PhoneNumber" ], array: true },
-         "phoneNumbers.value"        : { name: "PhoneNumber", fields: [ "PhoneNumber" ], array: true },
-         "emails"                    : { name: "EmailAddress", fields: [ "EmailAddress" ], array: true },
-         "addresses"                 : { name: "Address", fields: [ "Street", "Region", "PostOfficeBox", "Postcode", "Locality", "Country" ], array: true },
-         "addresses.formatted"       : { name: "Address", fields: [ "Street", "Region", "PostOfficeBox", "Postcode", "Locality", "Country" ], array: true },
-         "addresses.streetAddress"   : { name: "Address", fields: [ "Street" ], array: true },
-         "addresses.locality"        : { name: "Address", fields: [ "Locality" ], array: true },
-         "addresses.region"          : { name: "Address", fields: [ "Region" ], array: true },
-         "addresses.country"         : { name: "Address", fields: [ "Country" ], array: true },
-         "organizations"             : { name: "Organization", fields: [ "Name", "Title", "Department" ], array: true },
-         "organizations.name"        : { name: "Organization", fields: [ "Name" ], array: true },
-         "organizations.title"       : { name: "Organization", fields: [ "Title" ], array: true },
-         "organizations.department"  : { name: "Organization", fields: [ "Department" ], array: true },
-         "birthday"                  : { name: "Birthday", fields: [ "Birthday" ], array: false },
-         "note"                      : { name: "Note", fields: [ "Note" ], array: false },
-         "urls"                      : { name: "Url", fields: [ "Url" ], array: true },
-         "urls.value"                : { name: "Url", fields: [ "Url" ], array: true },
-         "photos"                    : { name: "Avatar", fields: [ "ImageUrl" ], array: false },
-         "ringtone"                  : { name: "Ringtone", fields: [ "AudioRingtoneUrl" ], array: false },
-         "gender"                    : { name: "Gender", fields: [ "Gender" ], array: false },
-         "anniversaries"             : { name: "Anniversary", fields: [ "OriginalDate" ], array: true },
+         "id"                        : { name: "Guid", fields: { id: "Guid" }, array: false },
+         "displayName"               : { name: "DisplayLabel", fields: { displayName: "Label" }, array: false },
+         "name"                      : { name: "Name", fields: { formatted: [ "honorificPrefix", "givenName", "familyName" ], honorificPrefix: "Prefix", givenName: "FirstName", middleName: "MiddleName", familyName: "LastName", honorificSuffix: "Suffix" }, array: false, formatSeparator: " " },
+         "phoneNumbers"              : { name: "PhoneNumber", fields: { pref: false, type: "Context", value: "PhoneNumber" }, array: true },
+         "emails"                    : { name: "EmailAddress", fields: { pref: false, type: "Context", value: "EmailAddress" }, array: true },
+         "addresses"                 : { name: "Address", fields: { pref: false, type: "Context", formatted: [ "streetAddress", "locality", "region", "postalCode", "country" ], streetAddress: "Street", region: "Region", postOfficeBox: "PostOfficeBox", postalCode: "Postcode", locality: "Locality", country: "Country" }, array: true, formatSeparator: ", " },
+         "organizations"             : { name: "Organization", fields: { pref: false, type: "Context", name: "Name", title: "Title", department: "Department" }, array: true },
+         "birthday"                  : { name: "Birthday", fields: { birthday: "Birthday" }, array: false },
+         "note"                      : { name: "Note", fields: { note: "Note" }, array: false },
+         "urls"                      : { name: "Url", fields: { pref: false, type: "Context", value: "Url" }, array: true },
+         "photos"                    : { name: "Avatar", fields: { pref: false, type: false, value: "ImageUrl" }, array: true },
+         "ringtones"                 : { name: "Ringtone", fields: { pref: false, type: false, value: "AudioRingtoneUrl" }, array: true },
+         "gender"                    : { name: "Gender", fields: { gender: "Gender" }, array: false },
+         "anniversaries"             : { name: "Anniversary", fields: { pref: false, type: false, value: "OriginalDate" }, array: true }
     };
 
 
@@ -1870,185 +1844,6 @@ var ContactFindOptions = function(filter, multiple) {
 
         return result;
     };
-
-//    /**
-//     * Creates a Contact object from a Contact object,
-//     * copying only the fields specified.
-//     *
-//     * This is intended as a privately used function but it is made globally
-//     * available so that a Contact.save can convert a BlackBerry contact object
-//     * into its W3C equivalent.
-//     *
-//     * @param {blackberry.pim.Contact} bbContact BlackBerry Contact object
-//     * @param {String[]} fields array of contact fields that should be copied
-//     * @return {Contact} a contact object containing the specified fields
-//     * or null if the specified contact is null
-//     */
-//    Contacts.prototype._createContact = function(hContact, fields) {
-
-//        if (!hContact) {
-//            return null;
-//        }
-
-//        // construct a new contact object
-//        // always copy the contact id and displayName fields
-//        var contact = new Contact(hContact.id, hContact.displayName);
-
-//        // nothing to do
-//        if (!fields || !(fields instanceof Array) || fields.length == 0) {
-//            return contact;
-//        } else if (fields.length == 1 && fields[0] === "*") {
-//            // PhoneGap enhancement to allow fields value of ["*"] to indicate
-//            // all supported fields.
-//            fields = allFields;
-//        }
-
-//        // add the fields specified
-//        for (var i in fields) {
-//            var field = fields[i];
-
-//            if (!field) {
-//                continue;
-//            }
-
-//            // name
-//            if (field.indexOf('name') === 0) {
-//                var formattedName = bbContact.title + ' ' +
-//                    bbContact.firstName + ' ' + bbContact.lastName;
-//                contact.name = new ContactName(formattedName, bbContact.lastName,
-//                        bbContact.firstName, null, bbContact.title, null);
-//            }
-//            // phone numbers
-//            else if (field.indexOf('phoneNumbers') === 0) {
-//                var phoneNumbers = [];
-//                if (bbContact.homePhone) {
-//                    phoneNumbers.push(new ContactField('home', bbContact.homePhone));
-//                }
-//                if (bbContact.homePhone2) {
-//                    phoneNumbers.push(new ContactField('home', bbContact.homePhone2));
-//                }
-//                if (bbContact.workPhone) {
-//                    phoneNumbers.push(new ContactField('work', bbContact.workPhone));
-//                }
-//                if (bbContact.workPhone2) {
-//                    phoneNumbers.push(new ContactField('work', bbContact.workPhone2));
-//                }
-//                if (bbContact.mobilePhone) {
-//                    phoneNumbers.push(new ContactField('mobile', bbContact.mobilePhone));
-//                }
-//                if (bbContact.faxPhone) {
-//                    phoneNumbers.push(new ContactField('fax', bbContact.faxPhone));
-//                }
-//                if (bbContact.pagerPhone) {
-//                    phoneNumbers.push(new ContactField('pager', bbContact.pagerPhone));
-//                }
-//                if (bbContact.otherPhone) {
-//                    phoneNumbers.push(new ContactField('other', bbContact.otherPhone));
-//                }
-//                contact.phoneNumbers = phoneNumbers.length > 0 ? phoneNumbers : null;
-//            }
-//            // emails
-//            else if (field.indexOf('emails') === 0) {
-//                var emails = [];
-//                if (bbContact.email1) {
-//                    emails.push(new ContactField(null, bbContact.email1, null));
-//                }
-//                if (bbContact.email2) {
-//                    emails.push(new ContactField(null, bbContact.email2, null));
-//                }
-//                if (bbContact.email3) {
-//                    emails.push(new ContactField(null, bbContact.email3, null));
-//                }
-//                contact.emails = emails.length > 0 ? emails : null;
-//            }
-//            // addresses
-//            else if (field.indexOf('addresses') === 0) {
-//                var addresses = [];
-//                if (bbContact.homeAddress) {
-//                    addresses.push(createContactAddress("home", bbContact.homeAddress));
-//                }
-//                if (bbContact.workAddress) {
-//                    addresses.push(createContactAddress("work", bbContact.workAddress));
-//                }
-//                contact.addresses = addresses.length > 0 ? addresses : null;
-//            }
-//            // birthday
-//            else if (field.indexOf('birthday') === 0) {
-//                if (bbContact.birthday) {
-//                    contact.birthday = bbContact.birthday;
-//                }
-//            }
-//            // note
-//            else if (field.indexOf('note') === 0) {
-//                if (bbContact.note) {
-//                    contact.note = bbContact.note;
-//                }
-//            }
-//            // organizations
-//            else if (field.indexOf('organizations') === 0) {
-//                var organizations = [];
-//                if (bbContact.company || bbContact.jobTitle) {
-//                    organizations.push(
-//                        new ContactOrganization(null, null, bbContact.company, null, bbContact.jobTitle));
-//                }
-//                contact.organizations = organizations.length > 0 ? organizations : null;
-//            }
-//            // categories
-//            else if (field.indexOf('categories') === 0) {
-//                if (bbContact.categories && bbContact.categories.length > 0) {
-//                    contact.categories = bbContact.categories;
-//                } else {
-//                    contact.categories = null;
-//                }
-//            }
-//            // urls
-//            else if (field.indexOf('urls') === 0) {
-//                var urls = [];
-//                if (bbContact.webpage) {
-//                    urls.push(new ContactField(null, bbContact.webpage));
-//                }
-//                contact.urls = urls.length > 0 ? urls : null;
-//            }
-//            // photos
-//            else if (field.indexOf('photos') === 0) {
-//                var photos = [];
-//                // The BlackBerry Contact object will have a picture attribute
-//                // with Base64 encoded image
-//                if (bbContact.picture) {
-//                    photos.push(new ContactField('base64', bbContact.picture));
-//                }
-//                contact.photos = photos.length > 0 ? photos : null;
-//            }
-//        }
-
-//        return contact;
-//    };
-
-//    /**
-//     * Create a W3C ContactAddress object from a BlackBerry Address object.
-//     *
-//     * @param {String} type the type of address (e.g. work, home)
-//     * @param {blackberry.pim.Address} bbAddress a BlakcBerry Address object
-//     * @return {ContactAddress} a contact address object or null if the specified
-//     * address is null
-//     */
-//    var createContactAddress = function(type, bbAddress) {
-
-//        if (!bbAddress) {
-//            return null;
-//        }
-
-//        var address1 = bbAddress.address1 || "";
-//        var address2 = bbAddress.address2 || "";
-//        var streetAddress = address1 + ", " + address2;
-//        var locality = bbAddress.city || "";
-//        var region = bbAddress.stateProvince || "";
-//        var postalCode = bbAddress.zipPostal || "";
-//        var country = bbAddress.country || "";
-//        var formatted = streetAddress + ", " + locality + ", " + region + ", " + postalCode + ", " + country;
-
-//        return new ContactAddress(null, type, formatted, streetAddress, locality, region, postalCode, country);
-//    };
 
     /**
      * Define navigator.contacts object.
