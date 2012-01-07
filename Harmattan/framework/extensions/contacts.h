@@ -15,7 +15,7 @@ class Contacts : public QObject {
     public:
         explicit Contacts(QObject *parent = 0);
 
-        Q_INVOKABLE QVariantMap findContacts(QVariantMap fields, QString filter, bool multiple = true) const;
+        Q_INVOKABLE QVariantList findContacts(QVariantMap fields, QString filter, bool multiple = true) const;
 
     private slots:
         void contactFetchRequestStateChanged(QContactAbstractRequest::State newState);

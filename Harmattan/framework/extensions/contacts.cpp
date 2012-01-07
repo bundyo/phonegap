@@ -21,16 +21,13 @@ Contacts::Contacts(QObject *parent) :
 
 }
 
-QVariantMap Contacts::findContacts(QVariantMap fields, QString filter, bool multiple) const {
+QVariantList Contacts::findContacts(QVariantMap fields, QString filter, bool multiple) const {
 
-    QVariantMap keys;
     QContactUnionFilter currentFilter = QContactUnionFilter();
 
     foreach( const QVariant current, fields ) {
         QContactUnionFilter detailFilter;
         QVariantMap map = current.toMap();
-
-        keys.insert(map.value("name").toString(), fields.key(current));
 
         foreach( const QVariant field, map.value("fields").toList() ) {
             QContactDetailFilter subFilter;
@@ -44,17 +41,40 @@ QVariantMap Contacts::findContacts(QVariantMap fields, QString filter, bool mult
 
     QList<QContact> result = m_contacts->contacts(currentFilter);
 
-    qDebug() << keys;
+    QVariantList resultList;
 
-    QVariantList map;
+    int count = 0;
+    foreach( const QContact currentContact, result ) {
+        count++;
+        QVariantMap contactMap;
+        foreach( const QVariant current, fields ) {
+            QVariantMap map = current.toMap();
+            QStringList contactFieldList;
 
-//    foreach( const QContact currentContact, result ) {
-//        foreach( const QString field, keys ) {
-//            field.
-//        }
-//    }
+            QList<QContactDetail> details = currentContact.details(map.value("name").toString());
 
-    return map;
+            foreach( const QContactDetail detail, details ) {
+                QString contactField = "";
+                foreach( const QVariant field, map.value("fields").toList() ) {
+                    contactField += detail.variantValue(field.toString()).toString() + " ";
+                }
+                contactFieldList.append(contactField.trimmed());
+            }
+
+            if (contactFieldList.count() != 0) {
+                if (map.value("array").toBool())
+                    contactMap.insert(fields.key(current), contactFieldList);
+                else
+                    contactMap.insert(fields.key(current), contactFieldList.first());
+            } else
+                contactMap.insert(fields.key(current), "");
+        }
+        resultList.append(contactMap);
+        if (!multiple && count == 1)
+            break;
+    }
+
+    return resultList;
 }
 
 void Contacts::contactFetchRequestStateChanged(QContactAbstractRequest::State newState) {

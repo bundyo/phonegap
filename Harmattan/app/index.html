@@ -426,10 +426,10 @@
 	// Contacts
 	//-------------------------------------------------------------------------
 
-    function getContacts() {
+    function getContacts(filter, multiple) {
 		obj = new ContactFindOptions();
-        obj.filter = "un";
-		obj.multiple = true;
+        obj.filter = filter;
+        obj.multiple = multiple;
 		obj.limit = 1000;
         navigator.contacts.find(
 			["displayName", "name", "phoneNumbers", "emails", "urls", "note"],
@@ -442,13 +442,15 @@
 					s = "Number of contacts: "+contacts.length+"<br><table width='100%'><tr><th>Name</th><td>Phone</td><td>Email</td></tr>";
 					for (var i=0; i<contacts.length; i++) {
 						var contact = contacts[i];
-						s = s + "<tr><td>" + contact.name.formatted + "</td><td>";
+
+                        console.log(JSON.stringify(contact));
+                        s = s + "<tr><td>" + contact.name + "</td><td>";
 						if (contact.phoneNumbers.length > 0) {
-							s = s + contact.phoneNumbers[0].value;
+                            s = s + contact.phoneNumbers[0].value;
 						}
 						s = s + "</td><td>"
 						if (contact.emails.length > 0) {
-							s = s + contact.emails[0].value;
+                            s = s + contact.emails[0].value;
 						}
 						s = s + "</td></tr>";
 					}
@@ -1057,7 +1059,7 @@
 		<b>Results:<b><br>
 		<span id="contacts_results">&nbsp;</span>
 	</div>
-    <a href="javascript:" class="btn large" onclick="getContacts();">Get phone's contacts</a>
+    <a href="javascript:" class="btn large" onclick="getContacts('un', true);">Get phone's contacts</a>
 
 	<!-- Audio -->
 <!--	<div id="info">
