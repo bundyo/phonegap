@@ -997,7 +997,7 @@ var Acceleration = function(accelObject) {
      * @return String                       The watch id that must be passed to #clearWatch to stop watching.
      */
     Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallback, options) {
-        // Default interval (10 sec)
+        // Default interval (10 secs)
         var frequency = (options != undefined)? options.frequency : 10000,
             self = this;
 
@@ -1103,7 +1103,7 @@ var CompassState = function(headingObject) {
         // Get compass state
         try {
             this.lastCompassState = CompassState(GapCompass.getCurrentHeading());
-            successCallback(this.lastCompassState.trueHeading);
+            successCallback(this.lastCompassState);
         } catch(err) {
             errorCallback();
         }
@@ -1118,8 +1118,8 @@ var CompassState = function(headingObject) {
      * @return String                       The watch id that must be passed to #clearWatch to stop watching.
      */
     Compass.prototype.watchHeading = function(successCallback, errorCallback, options) {
-        // Default interval (10 sec)
-        var frequency = (options != undefined)? options.frequency : 10000,
+        // Default interval 100ms
+        var frequency = (options != undefined)? options.frequency : 100,
             self = this;
 
         // successCallback required

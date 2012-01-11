@@ -23,19 +23,20 @@ Window {
             id: webView
             objectName: "webView"
             transformOrigin: Item.TopLeft
-            smooth: false
+            smooth: true
             preferredWidth: flickable.width
             preferredHeight: flickable.height
             contentsScale: 1
+            settings.developerExtrasEnabled: true
             settings.localContentCanAccessRemoteUrls: true
             settings.localStorageDatabaseEnabled: true
             settings.offlineStorageDatabaseEnabled: true
             settings.offlineWebApplicationCacheEnabled: true
             settings.javascriptCanAccessClipboard: true
             url: pageUrl
-            onContentsSizeChanged: {
-                contentsScale = Math.min(1,flickable.width / contentsSize.width)
-            }
+//            onContentsSizeChanged: {
+//                contentsScale = Math.min(1,flickable.width / contentsSize.width)
+//            }
         }
     }
     ScrollDecorator {
@@ -52,7 +53,7 @@ Window {
         property string contentText
         property string button1Text
         property string button2Text
-        property bool button1Visible
+        property bool button1Visible: true
         property bool button2Visible
         property bool state
         property bool inPortrait: appWindow.inPortrait
@@ -182,10 +183,10 @@ Window {
                 value: "DCIM"
             }
 
-            ScrollDecorator {
-                id: galleryDecorator
-                flickableItem: gallery
-            }
+// WTF! Segmentation fault in portrait when this ScrollDecorator is enabled.
+//            ScrollDecorator {
+//                flickableItem: gallery
+//            }
         }
 
         onStatusChanged: {

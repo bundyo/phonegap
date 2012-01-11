@@ -124,7 +124,7 @@
 
 		// Success callback
         var success = function(a){
-            document.getElementById('compassHeading').innerHTML = roundNumber(a);
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.trueHeading);
         };
 
 		// Fail callback
@@ -164,7 +164,7 @@
 
 		// Success callback
         var success = function(a){
-            document.getElementById('compassHeading').innerHTML = roundNumber(a);
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.trueHeading);
         };
 
 		// Fail callback

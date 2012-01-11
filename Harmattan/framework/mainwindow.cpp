@@ -14,8 +14,6 @@
 #include <QDeclarativeEngine>
 #include <QWebSettings>
 #include <QWebFrame>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
 
 #ifdef Q_OS_UNIX
 #include <QX11Info>
@@ -63,9 +61,9 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
     setFrameShape(QFrame::NoFrame);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setOptimizationFlags(QGraphicsView::DontSavePainterState);
     setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setCacheMode( QGraphicsView::CacheBackground );
+    setAttribute(Qt::WA_TranslucentBackground, false);
     setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
 
     QDir templateDir = QApplication::applicationDirPath();
@@ -87,29 +85,27 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
     engine->rootContext()->setContextProperty("notifier", notifier);
 
     ((QDeclarativeWebView*) QMLWebView)->setPage(new WebPage());
+    QMLWebView->setProperty("pageUrl", "../app/index.html");
     ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
     ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageDatabaseEnabled, true);
     ((QDeclarativeWebView*) QMLWebView)->settings()->enablePersistentStorage();
-    QMLWebView->setProperty("pageUrl", "../app/index.html");
+    QMLWebView->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
     new Extensions(((QDeclarativeWebView*) QMLWebView));
 
     scene->addItem(qobject_cast<QGraphicsItem*>(comp));
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     scene->setSceneRect(0,0,width(),height());
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     QMLView = new QGraphicsView( this );
     QMLView->setScene( scene );
     QMLView->setGeometry(0,0,width(),height());
     QMLView->setStyleSheet( "background: transparent; border: none;" );
-    QMLView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     QMLView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     QMLView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     QMLView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     QMLView->setCacheMode( QGraphicsView::CacheBackground );
     QMLView->setFrameShape(QFrame::NoFrame);
-
-//    QMLView->show();
 
     ((QDeclarativeWebView*) QMLWebView)->page()->mainFrame()->evaluateJavaScript("window._nativeReady = true"); // Tell PhoneGap that init is complete.
 }

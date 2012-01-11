@@ -51,8 +51,7 @@ QString WebPage::userAgentForUrl ( const QUrl & url ) const {
 }
 
 void WebPage::loadFinished(bool ok) {
-
-//    if (!ok) {
-//        QMessageBox::warning(0, "Error", "There was an error loading the page " + mainFrame()->url().toString());
-//    }
+    if (!ok) {
+        QMessageBox::warning(0, "Error", "There was an error loading the page " + mainFrame()->url().toString());
+    }
 }
