@@ -88,6 +88,8 @@ MainWindow::MainWindow(QGraphicsScene *parent) :
     QMLWebView->setProperty("pageUrl", "../app/index.html");
     ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
     ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::LocalStorageDatabaseEnabled, true);
+    ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
+    ((QDeclarativeWebView*) QMLWebView)->page()->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
     ((QDeclarativeWebView*) QMLWebView)->settings()->enablePersistentStorage();
     QMLWebView->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 

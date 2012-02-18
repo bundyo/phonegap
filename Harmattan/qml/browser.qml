@@ -135,8 +135,8 @@ Window {
             id: gallery
             width: galleryDialog.width
             height: galleryDialog.height
-            cellWidth: appWindow.inPortrait ? appWindow.height / 3 : appWindow.width / 5.05
-            cellHeight: cellWidth
+            cellWidth: appWindow.inPortrait ? appWindow.height / 3 : appWindow.width / 5.05;
+            cellHeight: cellWidth;
 
             model: DocumentGalleryModel {
                 rootType: DocumentGallery.Image

@@ -22,8 +22,7 @@ QVariantMap Compass::getCurrentHeading() const {
 }
 
 void Compass::updateSensor() {
-
     QCompassReading *reading = m_compass->reading();
-    m_azymuth = reading->azimuth();
+    m_azymuth = -reading->azimuth(); // Azymuth seems to be opposite of what gets returned in other OSes.
     m_calibrationLevel = reading->calibrationLevel();
 }
