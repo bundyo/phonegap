@@ -1,0 +1,1124 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=2.0, minimum-scale=2.0, maximum-scale=2.0, user-scalable=no;" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
+    <title>PhoneGap</title>
+      <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+      <script type="text/javascript" charset="utf-8" src="js/phonegap.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/helloPlugin.js"></script>
+      <script type="text/javascript" charset="utf-8">
+
+    function roundNumber(num) {
+      var dec = 3;
+      var result = Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+      return result;
+    }
+
+	//-------------------------------------------------------------------------
+	// Device Info
+	//-------------------------------------------------------------------------
+    var deviceInfo = function() {
+      	document.getElementById("platform").innerHTML = device.platform;
+      	document.getElementById("version").innerHTML = device.version;
+      	document.getElementById("uuid").innerHTML = device.uuid;
+      	document.getElementById("name").innerHTML = device.name;
+      	document.getElementById("phonegap_version").innerHTML = device.phonegap;
+
+//        PluginManager.addService("Demo", "com.ibm.swgtc.demo.DemoPlugin");
+
+		// Use PhoneGap's Geolocation instead of built-in
+		// This can be used for the Android emulator or commented out when running on phone.
+        Geolocation.usePhoneGap();
+	};
+
+        //-------------------------------------------------------------------------
+	// Acceleration
+	//-------------------------------------------------------------------------
+	var watchAccelId = null;
+
+	/**
+	 * Start watching acceleration
+	 */
+    var watchAccel = function() {
+        console.log("watchAccel()");
+
+		// Success callback
+        var success = function(a){
+            document.getElementById('x').innerHTML = roundNumber(a.x);
+            document.getElementById('y').innerHTML = roundNumber(a.y);
+            document.getElementById('z').innerHTML = roundNumber(a.z);
+            console.log("watchAccel success callback");
+        };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("watchAccel fail callback with error code "+e);
+			stopAccel();
+			setAccelStatus(navigator.accelerometer.ERROR_MSG[e]);
+        };
+
+		// Update acceleration every 1 sec
+        var opt = {};
+        opt.frequency = 1000;
+        watchAccelId = navigator.accelerometer.watchAcceleration(success, fail, opt);
+
+		setAccelStatus("Running");
+    };
+
+    /**
+     * Stop watching the acceleration
+	 */
+    var stopAccel = function() {
+		setAccelStatus("Stopped");
+        if (watchAccelId) {
+            navigator.accelerometer.clearWatch(watchAccelId);
+            watchAccelId = null;
+        }
+    };
+
+	/**
+	 * Get current acceleration
+	 */
+    var getAccel = function() {
+        console.log("getAccel()");
+
+		// Stop accel if running
+		stopAccel();
+
+		// Success callback
+        var success = function(a){
+            document.getElementById('x').innerHTML = roundNumber(a.x);
+            document.getElementById('y').innerHTML = roundNumber(a.y);
+            document.getElementById('z').innerHTML = roundNumber(a.z);
+        };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("getAccel fail callback with error code "+e);
+			setAccelStatus(navigator.accelerometer.ERROR_MSG[e]);
+        };
+
+		// Make call
+        var opt = {};
+        navigator.accelerometer.getCurrentAcceleration(success, fail, opt);
+    };
+
+	/**
+	 * Set accelerometer status
+	 */
+	var setAccelStatus = function(status) {
+		document.getElementById('accel_status').innerHTML = status;
+	};
+
+	//-------------------------------------------------------------------------
+	// Compass
+	//-------------------------------------------------------------------------
+	var watchCompassId = null;
+
+	/**
+	 * Start watching compass
+	 */
+    var watchCompass = function() {
+        console.log("watchCompass()");
+
+		// Success callback
+        var success = function(a){
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.trueHeading);
+        };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("watchCompass fail callback with error code "+e);
+			stopCompass();
+			setCompassStatus(navigator.compass.ERROR_MSG[e]);
+        };
+
+		// Update heading every 1 sec
+        var opt = {};
+        opt.frequency = 1000;
+        watchCompassId = navigator.compass.watchHeading(success, fail, opt);
+
+		setCompassStatus("Running");
+    };
+
+    /**
+     * Stop watching the acceleration
+	 */
+    var stopCompass = function() {
+		setCompassStatus("Stopped");
+        if (watchCompassId) {
+            navigator.compass.clearWatch(watchCompassId);
+            watchCompassId = null;
+        }
+    };
+
+	/**
+	 * Get current compass
+	 */
+    var getCompass = function() {
+        console.log("getCompass()");
+
+		// Stop compass if running
+		stopCompass();
+
+		// Success callback
+        var success = function(a){
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.trueHeading);
+        };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("getCompass fail callback with error code "+e);
+			setCompassStatus(navigator.compass.ERROR_MSG[e]);
+        };
+
+		// Make call
+        var opt = {};
+        navigator.compass.getCurrentHeading(success, fail, opt);
+    };
+
+	/**
+	 * Set compass status
+	 */
+	var setCompassStatus = function(status) {
+		document.getElementById('compass_status').innerHTML = status;
+	};
+
+	//-------------------------------------------------------------------------
+	// Location
+	//-------------------------------------------------------------------------
+	var watchLocationId = null;
+
+	/**
+	 * Start watching location
+	 */
+    var watchLocation = function() {
+        console.log("watchLocation()");
+
+		// Success callback
+        var success = function(p){
+            document.getElementById('latitude').innerHTML = p.coords.latitude;
+            document.getElementById('longitude').innerHTML = p.coords.longitude;
+        };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("watchLocation fail callback with error code "+e);
+			stopLocation();
+        };
+
+		// Get location
+      	watchLocationId = navigator.geolocation.watchPosition(success, fail, {enableHighAccuracy: true});
+		setLocationStatus("Running");
+    };
+
+    /**
+     * Stop watching the location
+	 */
+    var stopLocation = function() {
+		setLocationStatus("Stopped");
+        if (watchLocationId) {
+            navigator.geolocation.clearWatch(watchLocationId);
+            watchLocationId = null;
+        }
+    };
+
+	/**
+	 * Get current location
+	 */
+    var getLocation = function() {
+        console.log("getLocation()");
+
+		// Stop location if running
+		stopLocation();
+
+		// Success callback
+        var success = function(p){
+            document.getElementById('latitude').innerHTML = p.coords.latitude;
+            document.getElementById('longitude').innerHTML = p.coords.longitude;
+			setLocationStatus("Done");
+	    };
+
+		// Fail callback
+        var fail = function(e){
+            console.log("getLocation fail callback with error code "+e.code);
+			setLocationStatus("Error: "+e.code);
+        };
+
+		// Get location
+        navigator.geolocation.getCurrentPosition(success, fail, {enableHighAccuracy: true}); //, {timeout: 10000});
+		setLocationStatus("Retrieving location...");
+
+    };
+
+	/**
+	 * Set location status
+	 */
+	var setLocationStatus = function(status) {
+		document.getElementById('location_status').innerHTML = status;
+	};
+
+	//-------------------------------------------------------------------------
+	// Network
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Check network status
+	 */
+	 var isReachable = function() {
+            document.getElementById('reachable_status').innerHTML = "Retrieving...";
+            navigator.network.isReachable("phonegap.com",
+
+			// Success callback
+			function(reachability) {
+                                console.log(reachability);
+				// There is no consistency on the format of reachability
+				var networkState = reachability.internetConnectionStatus || reachability.code || reachability;
+
+				var states = {};
+				states[NetworkStatus.NOT_REACHABLE]                      = 'No network connection';
+				states[NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK] = 'Carrier data connection';
+				states[NetworkStatus.REACHABLE_VIA_WIFI_NETWORK]         = 'WiFi connection';
+
+				document.getElementById('reachable_status').innerHTML = states[networkState];
+			},
+
+			// Fail callback
+			function(e) {
+				document.getElementById('reachable_status').innerHTML = "Error: " + e;
+			});
+	};
+
+	//-------------------------------------------------------------------------
+	// Notifications
+	//-------------------------------------------------------------------------
+
+    var beep = function(){
+        navigator.notification.beep(3);
+    };
+
+    var vibrate = function(){
+      navigator.notification.vibrate();
+    };
+
+	var alertDialog = function(message, title, button) {
+		console.log("alertDialog()");
+		navigator.notification.alert(message,
+			function(){
+				console.log("Alert dismissed.");
+			},
+			title, button);
+		console.log("After alert");
+	};
+
+	var confirmDialog = function(message, title, buttons) {
+		navigator.notification.confirm(message,
+			function(r) {
+				console.log("You selected " + r);
+			},
+			title,
+			buttons);
+	};
+
+	var spinner = function() {
+    	navigator.notification.activityStart();
+		setTimeout(function() { navigator.notification.activityStop(); }, 10000);
+	}
+
+	var progressInterval = null;
+	var progressValue = 0;
+	var progress = function() {
+    	navigator.notification.progressStart("Test", "Wait for it...");
+		progressInterval = setInterval(function() {
+			if (progressValue > 90) {
+				clearInterval(progressInterval);
+				navigator.notification.progressStop();
+				progressValue = 0;
+			}
+			else {
+				progressValue = progressValue + 10;
+				navigator.notification.progressValue(progressValue);
+			}
+		}, 1000);
+	}
+
+	//-------------------------------------------------------------------------
+	// Camera
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Capture picture
+	 */
+    function getPicture() {
+      	navigator.camera.getPicture(
+    		function(data) {
+      			var img = document.getElementById('camera_image');
+      			img.style.visibility = "visible";
+				img.style.display = "block";
+      			//img.src = "data:image/jpeg;base64," + data;
+				img.src = data;
+				document.getElementById('camera_status').innerHTML = "Success";
+   			},
+      		function(e) {
+				console.log("Error getting picture: " + e);
+				document.getElementById('camera_status').innerHTML = "Error getting picture.";
+      		},
+      		{ quality: 50, destinationType: navigator.camera.DestinationType.FILE_URI});
+    };
+
+	/**
+	 * Select image from library
+	 */
+    function getImage() {
+      	navigator.camera.getPicture(
+    		function(data) {
+      			var img = document.getElementById('camera_image');
+      			img.style.visibility = "visible";
+				img.style.display = "block";
+      			//img.src = "data:image/jpeg;base64," + data;
+				img.src = data;
+				document.getElementById('camera_status').innerHTML = "Success";
+   			},
+      		function(e) {
+				console.log("Error getting picture: " + e);
+				document.getElementById('camera_status').innerHTML = "Error getting picture.";
+      		},
+                { quality: 50, destinationType: navigator.camera.DestinationType.FILE_URI, sourceType: navigator.camera.PictureSourceType.SAVEDPHOTOALBUM});
+    };
+
+	/**
+	 * Get picture and upload as base64 image
+	 */
+    function getPictureUpload() {
+      	navigator.camera.getPicture(
+    		function(data) {
+      			var img = document.getElementById('camera_image');
+      			img.style.visibility = "visible";
+				img.style.display = "block";
+      			img.src = "data:image/jpeg;base64," + data;
+				//img.src = data;
+				document.getElementById('camera_status').innerHTML = "Success";
+
+				try {
+			    	var ajaxReq = new XMLHttpRequest();
+					ajaxReq.open("POST", "http://192.168.0.199/mobile/apps/demo/demo.php", true);
+					ajaxReq.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    				ajaxReq.onreadystatechange = function(){
+        				if(ajaxReq.readyState == 4){
+            				console.log("POST XHR status="+ajaxReq.status+": "+ajaxReq.responseText);
+						}
+					};
+					ajaxReq.send("picture="+data);
+  				}
+  				catch (ex) {
+					console.log("Error: " + ex);
+  				}
+   			},
+      		function(e) {
+				console.log("Error getting picture: " + e);
+				document.getElementById('camera_status').innerHTML = "Error getting picture.";
+      		},
+      		{ quality: 50, destinationType: navigator.camera.DestinationType.DATA_URL, sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
+	//-------------------------------------------------------------------------
+	// Contacts
+	//-------------------------------------------------------------------------
+
+    function getContacts(filter, multiple) {
+		obj = new ContactFindOptions();
+        obj.filter = filter;
+        obj.multiple = multiple;
+		obj.limit = 1000;
+        navigator.contacts.find(
+			["displayName", "name", "phoneNumbers", "emails", "urls", "note"],
+        	function(contacts) {
+				var s = "";
+				if (contacts.length == 0) {
+					s = "No contacts found";
+				}
+				else {
+					s = "Number of contacts: "+contacts.length+"<br><table width='100%'><tr><th>Name</th><td>Phone</td><td>Email</td></tr>";
+					for (var i=0; i<contacts.length; i++) {
+						var contact = contacts[i];
+
+                        s = s + "<tr><td>" + contact.name.formatted + "</td><td>";
+						if (contact.phoneNumbers.length > 0) {
+                            s = s + contact.phoneNumbers[0].value;
+						}
+						s = s + "</td><td>"
+						if (contact.emails.length > 0) {
+                            s = s + contact.emails[0].value;
+						}
+						s = s + "</td></tr>";
+					}
+					s = s + "</table>";
+				}
+				document.getElementById('contacts_results').innerHTML = s;
+        	},
+        	function(e) {
+				document.getElementById('contacts_results').innerHTML = "Error: "+e;
+        	},
+			obj);
+	};
+
+	//-------------------------------------------------------------------------
+	// Audio player
+	//-------------------------------------------------------------------------
+    var media1 = null;
+    var media1Timer = null;
+	var audioSrc = null;
+
+	/**
+	 * Play audio
+	 */
+    function playAudio(url) {
+        console.log("playAudio()");
+        console.log(" -- media="+media1);
+
+		//var src = "http://neuga.s3.amazonaws.com/onclassical/strings-organ.mp3";
+		var src = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+		if (url) {
+			src = url;
+		}
+
+		// Stop playing if src is different from currently playing source
+		if (src != audioSrc) {
+			if (media1 != null) {
+				stopAudio();
+				media1 = null;
+			}
+		}
+
+        if (media1 == null) {
+
+
+        	// TEST STREAMING AUDIO PLAYBACK
+        	//var src = "http://nunzioweb.com/misc/Bon_Jovi-Crush_Mystery_Train.mp3";   // works
+        	//var src = "http://nunzioweb.com/misc/Bon_Jovi-Crush_Mystery_Train.m3u"; // doesn't work
+        	//var src = "http://www.wav-sounds.com/cartoon/bugsbunny1.wav"; // works
+        	//var src = "http://www.angelfire.com/fl5/html-tutorial/a/couldyou.mid"; // doesn't work
+        	//var src = "MusicSearch/mp3/train.mp3";    // works
+        	//var src = "bryce.mp3";  // works
+        	//var src = "/android_asset/www/bryce.mp3"; // works
+
+        	media1 = new Media(src,
+                function() {
+                    console.log("playAudio():Audio Success");
+                },
+                function(err) {
+                    console.log("playAudio():Audio Error: "+err);
+					setAudioStatus("Error: " + err);
+                },
+                function(status) {
+                    console.log("playAudio():Audio Status: "+status);
+					setAudioStatus(Media.MEDIA_MSG[status]);
+
+					// If stopped, then stop getting current position
+					if (Media.MEDIA_STOPPED == status) {
+						clearInterval(media1Timer);
+						media1Timer = null;
+					}
+                });
+        }
+		audioSrc = src;
+
+        // Play audio
+        media1.play();
+        if (media1Timer == null) {
+            media1Timer = setInterval(
+                function() {
+                    media1.getCurrentPosition(
+                        function(position) {
+                            console.log("Pos="+position);
+							if (position > -1) {
+								setAudioPosition(position+" sec");
+							}
+                        },
+                        function(e) {
+                            console.log("Error getting pos="+e);
+							setAudioPosition("Error: "+e);
+                        }
+                    );
+                },
+                1000
+            );
+        }
+
+		// Get duration
+		var counter = 0;
+		var timerDur = setInterval(
+			function() {
+				counter = counter + 100;
+				if (counter > 2000) {
+					clearInterval(timerDur);
+				}
+				var dur = media1.getDuration();
+				if (dur > 0) {
+					clearInterval(timerDur);
+					document.getElementById('audio_duration').innerHTML = dur + " sec";
+				}
+			}, 100);
+    }
+
+	/**
+	 * Pause audio playback
+	 */
+    function pauseAudio() {
+        console.log("pauseAudio()");
+        if (media1) {
+            media1.pause();
+        }
+    }
+
+	/**
+	 * Stop audio
+	 */
+    function stopAudio() {
+        console.log("stopAudio()");
+        if (media1) {
+            media1.stop();
+        }
+        clearInterval(media1Timer);
+		media1Timer = null;
+    }
+
+	/**
+	 * Set audio status
+	 */
+	var setAudioStatus = function(status) {
+		document.getElementById('audio_status').innerHTML = status;
+	};
+
+	/**
+	 * Set audio position
+	 */
+	var setAudioPosition = function(position) {
+		document.getElementById('audio_position').innerHTML = position;
+	};
+
+	//-------------------------------------------------------------------------
+	// Audio recorder
+	//-------------------------------------------------------------------------
+    var mediaRec = null;
+	var recTime = 0;
+
+	/**
+	 * Record audio
+	 */
+    function recordAudio() {
+        console.log("recordAudio()");
+        console.log(" -- media="+mediaRec);
+        if (mediaRec == null) {
+
+			var src = "myrecording.mp3";
+			mediaRec = new Media(src,
+					function() {
+						console.log("recordAudio():Audio Success");
+					},
+					function(err) {
+						console.log("recordAudio():Audio Error: "+err);
+						setAudioStatus("Error: " + err);
+					},
+					function(status) {
+						console.log("recordAudio():Audio Status: "+status);
+						setAudioStatus(Media.MEDIA_MSG[status]);
+					}
+				);
+        }
+
+		navigator.notification.beep(1);
+
+        // Record audio
+        mediaRec.startRecord();
+
+        // Stop recording after 10 sec
+		recTime = 0;
+        var recInterval = setInterval(function() {
+			recTime = recTime + 1;
+			setAudioPosition(recTime+" sec");
+			if (recTime >= 10) {
+				clearInterval(recInterval);
+            	mediaRec.stopRecord();
+            	console.log("recordAudio(): stop");
+   				navigator.notification.beep(1);
+			}
+        }, 1000);
+    }
+
+	/**
+	 * Play back recorded audio
+	 */
+	function playRecording() {
+		playAudio("myrecording.mp3");
+	}
+
+	//-------------------------------------------------------------------------
+	// File Tests
+	//-------------------------------------------------------------------------
+
+	var fileTests = function() {
+
+		fileTestsOutput("<hr>testSaveLocationExists");
+		navigator.fileMgr.testSaveLocationExists(
+			function(r) {
+				fileTestsOutput("- testSaveLocationExists: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- testSaveLocationExists: Failed ("+e+")");
+			});
+
+		fileTestsOutput("<hr>getFreeDiskSpace");
+		navigator.fileMgr.getFreeDiskSpace(
+			function(r) {
+				fileTestsOutput("- getFreeDiskSpace: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- getFreeDiskSpace: Failed ("+e+")");
+			});
+
+		writer = new FileWriter();
+		writer.oncomplete = function(evt) {
+				fileTestsOutput("<hr>write(sdcard/gapTemp.txt)");
+				fileTestsOutput("- write: Passed ("+evt.target.result+")");
+
+				var reader = new FileReader();
+				reader.onload = function(evt) {
+						fileTestsOutput("<hr>readAsText(sdcard/gapTemp.txt)");
+						fileTestsOutput("- readAsText: Passed ("+evt.target.result+")");
+					};
+				reader.onerror = function(evt) {
+						fileTestsOutput("<hr>readAsText(sdcard/gapTemp.txt)");
+						fileTestsOutput("- readAsText: Error ("+evt.target.error+")");
+					};
+				reader.readAsText("sdcard/gapTemp.txt");
+
+				var reader2 = new FileReader();
+				reader2.onload = function(evt) {
+						fileTestsOutput("<hr>readAsDataURL(sdcard/gapTemp.txt)");
+						fileTestsOutput("- readAsDataURL: Passed<br> ("+evt.target.result+")");
+					};
+				reader2.onerror = function(evt) {
+						fileTestsOutput("<hr>readAsDataURL(sdcard/gapTemp.txt)");
+						fileTestsOutput("- readAsDataURL: Error ("+evt.target.error+")");
+					};
+				reader2.readAsDataURL("sdcard/gapTemp.txt");
+
+			};
+		writer.onerror = function(e) {
+				fileTestsOutput("<hr>write(sdcard/gapTemp.txt)");
+				fileTestsOutput("- write: Error ("+e+")");
+			};
+		writer.write("sdcard/gapTemp.txt", "This is a test of PhoneGap FileWriter at "+(new Date())+".", false);
+
+		fileTestsOutput("<hr>testFileExists(Pic.jpg)");
+		navigator.fileMgr.testFileExists("Pic.jpg",
+			function(r) {
+				fileTestsOutput("- testFileExists: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- testFileExists: Error ("+e+")");
+			});
+
+		fileTestsOutput("<hr>testDirectoryExists(download)");
+		navigator.fileMgr.testDirectoryExists("download",
+			function(r) {
+				fileTestsOutput("- testDirectoryExists: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- testDirectoryExists: Error ("+e+")");
+			});
+
+		fileTestsOutput("<hr>createDirectory(gap123)");
+		navigator.fileMgr.createDirectory("gap123",
+			function(r) {
+				fileTestsOutput("- createDirectory: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- createDirectory: Error ("+e+")");
+			});
+
+		fileTestsOutput("<hr>testDirectoryExists(gap123)");
+		navigator.fileMgr.testDirectoryExists("gap123",
+			function(r) {
+				fileTestsOutput("- testDirectoryExists: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- testDirectoryExists: Error ("+e+")");
+			});
+
+		fileTestsOutput("<hr>deleteDirectory(gap123)");
+		navigator.fileMgr.deleteDirectory("gap123",
+			function(r) {
+				fileTestsOutput("- deleteDirectory: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- deleteDirectory: Error ("+e+")");
+			});
+
+		fileTestsOutput("<hr>testDirectoryExists(gap123)");
+		navigator.fileMgr.testDirectoryExists("gap123",
+			function(r) {
+				fileTestsOutput("- testDirectoryExists: Passed ("+r+")");
+			},
+			function(e) {
+				fileTestsOutput("- testDirectoryExists: Error ("+e+")");
+			});
+
+		//fileTestsOutput("DONE");
+    };
+
+	var fileTestsOutput = function(s) {
+		var el = document.getElementById("file_results");
+		el.innerHTML = el.innerHTML + s + "<br>";
+	};
+
+	//-------------------------------------------------------------------------
+	// Service
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Test the Hello service
+	 *
+	 * @param name
+         */
+	var callHelloService = function(name) {
+		var hello = new HelloPlugin();
+		hello.hello(name,
+			function(msg) {
+				alert(msg);
+			},
+			function(e) {
+				alert(e);
+			});
+	};
+
+	/**
+ 	 * Demo service class provides access to Demo service.
+ 	 */
+	function Demo() {
+	}
+
+	/**
+ 	 * Call echo.
+ 	 *
+	 * @param {String} text					The text to echo
+ 	 * @param {Function} successCallback    The function to call with the returned string.
+ 	 * @param {Function} errorCallback      The function to call when there is an error. (OPTIONAL)
+ 	 */
+        Demo.prototype.echo = function(text, successCallback, errorCallback) {
+        PhoneGap.exec(successCallback, errorCallback, "Demo", "echo", [text]);
+        };
+
+	/**
+	 * Test the Demo service
+	 *
+	 * @param text
+	 */
+	var callDemoService = function(text) {
+		var demo = new Demo();
+		demo.echo(text,
+			function(msg) {
+				alert(msg);
+			},
+			function(e) {
+				alert(e);
+			});
+	};
+
+	/**
+	 * Test the ChildBrowser service
+	 */
+	var childBrowserService = function(url) {
+		if (!window.plugins.childBrowser) {
+			PhoneGap.includeJavascript("childbrowser.js",
+				function() {
+					window.plugins.childBrowser.showWebPage(url, false);
+				});
+		}
+		else {
+			window.plugins.childBrowser.showWebPage(url, true);
+		}
+	};
+
+	//-------------------------------------------------------------------------
+	// HTML5 Database
+	//-------------------------------------------------------------------------
+
+	var callDatabase = function() {
+   		var db = openDatabase("mydb", "1.0", "PhoneGap Demo", 20000);
+		if (db === null) {
+			databaseOutput("Database could not be opened.");
+			return;
+		}
+		databaseOutput("Database opened.");
+		db.transaction(function (tx) {
+			tx.executeSql('DROP TABLE IF EXISTS DEMO');
+			tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)', [],
+			     function(tx,results) { console.log("Created table"); },
+			     function(tx,err) { alert("Error creating table: "+err.message); });
+            tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")', [],
+                 function(tx,results) { console.log("Insert row1 success"); },
+                 function(tx,err) { alert("Error adding 1st row: "+err.message); });
+			tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")', [],
+                 function(tx,results) { console.log("Insert row2 success"); },
+                 function(tx,err) { alert("Error adding 2nd row: "+err.message); });
+			databaseOutput("Data written to DEMO table.");
+            console.log("Data written to DEMO table.");
+
+	  		tx.executeSql('SELECT * FROM DEMO', [], function (tx, results) {
+   				var len = results.rows.length;
+   				var text = "DEMO table: " + len + " rows found.<br>";
+				text = text + "<table border='1'><tr><td>Row</td><td>Data</td></tr>";
+   				for (var i=0; i<len; i++){
+      				text = text + "<tr><td>" + i + "</td><td>" + results.rows.item(i).id + ", " + results.rows.item(i).data + "</td></tr>";
+				}
+				text = text + "</table>";
+				databaseOutput(text);
+   			}, function(tx, err) {
+				alert("Error processing SELECT * SQL: "+err.message);
+   			});
+	  		tx.executeSql('SELECT ID FROM DEMO', [], function (tx, results) {
+   				var len = results.rows.length;
+   				var text = "DEMO table: " + len + " rows found.<br>";
+				text = text + "<table border='1'><tr><td>Row</td><td>Data</td></tr>";
+   				for (var i=0; i<len; i++){
+      				text = text + "<tr><td>" + i + "</td><td>" + results.rows.item(i).id + "</td></tr>";
+				}
+				text = text + "</table>";
+				databaseOutput(text);
+   			}, function(tx, err) {
+				alert("Error processing SELECT ID SQL: "+err.message);
+   			});
+	  		
+		},
+		function(err) {
+			console.log("Transaction failed: " + err.message);
+		});
+
+		setTimeout(function() {
+		db.transaction(function (tx) {
+	  		tx.executeSql('SELECT * FROM DEMO WHERE id=2', [], function (tx, results) {
+   				var len = results.rows.length;
+   				var text = "DEMO table: " + len + " rows found.<br>";
+				text = text + "<table border='1'><tr><td>Row</td><td>Data</td></tr>";
+   				for (var i=0; i<len; i++){
+      				text = text + "<tr><td>" + i + "</td><td>" + results.rows.item(i).id + ", " + results.rows.item(i).data + "</td></tr>";
+				}
+				text = text + "</table>";
+				databaseOutput(text);
+   			}, function(tx, err) {
+				alert("Error processing SELECT * WHERE id=2 SQL: "+err.message);
+   			});
+		});}, 5000);
+
+	};
+
+	var databaseOutput = function(s) {
+		var el = document.getElementById("database_results");
+		el.innerHTML = el.innerHTML + s + "<br>";
+	};
+
+	//-------------------------------------------------------------------------
+	// Lifecycle
+	//-------------------------------------------------------------------------
+
+	/**
+	 * Function called when page has finished loading.
+	 */
+    function init() {
+        console.log("init()");
+        document.addEventListener("deviceready", deviceInfo, false);
+        document.addEventListener("resume", doResume, false);
+        document.addEventListener("pause", doPause, false);
+    }
+
+	/**
+	 * Function called when page is being unloaded.
+	 */
+    function unload() {
+        console.log("unload()");
+    }
+
+	/**
+	 * Function called when app is resuming.
+	 */
+    function doResume() {
+        console.log("resume()");
+    }
+
+	/**
+	 * Function called when app is pausing.
+	 */
+    function doPause() {
+        console.log("pause()");
+    }
+
+  </script>
+  </head>
+  <body onload="init();" onunload="unload();" id="stage" class="theme">
+    <h1>PhoneGap Demo</h1>
+
+	<!-- Device Info -->
+    <div id="info">
+    	<h2>Device Info</h2>
+		<table width="100%">
+		<tr><td><b>Platform:</b></td><td id="platform">&nbsp;</td></tr>
+      	<tr><td><b>Version:</b></td><td id="version">&nbsp;</td></tr>
+      	<tr><td><b>UUID:</b></td><td id="uuid">&nbsp;</td></tr>
+      	<tr><td><b>Device:</b></td><td id="name">&nbsp;</td></tr>
+      	<tr><td><b>PhoneGap:</b></td><td id="phonegap_version">&nbsp;</td></tr>
+		</table>
+	</div>
+
+	<!-- Acceleration -->
+	<div id="info">
+		<h2>Acceleration</h2>
+		<b>Status:</b> <span id="accel_status">Stopped</span>
+		<table width="100%"><tr>
+      		<td width="33%">X: <span id="x">&nbsp;</td>
+      		<td width="33%">Y: <span id="y">&nbsp;</td>
+      		<td>Z: <span id="z">&nbsp;</td>
+    	</tr></table>
+	</div>
+    <a href="" class="btn large" onclick="getAccel();return false;">Get Accelerometer</a>
+    <a href="" class="btn large" onclick="watchAccel();return false;">Start Watching Accelerometer</a>
+    <a href="" class="btn large" onclick="stopAccel();return false;">Stop Watching Accelerometer</a>
+
+	<!-- Compass -->
+	<div id="info">
+		<h2>Compass</h2>
+		<b>Status:</b> <span id="compass_status">Stopped</span>
+		<table width="100%"><tr>
+      		<td width="33%">Heading: <span id="compassHeading">&nbsp;</td>
+    	</tr></table>
+	</div>
+    <a href="#" class="btn large" onclick="getCompass();return false;">Get Compass</a>
+    <a href="#" class="btn large" onclick="watchCompass();return false;">Start Watching Compass</a>
+    <a href="#" class="btn large" onclick="stopCompass();return false;">Stop Watching Compass</a>
+
+	<!-- Location -->
+	<div id="info">
+		<h2>Location</h2>
+		<b>Status:</b> <span id="location_status">Stopped</span>
+		<table width="100%">
+      		<tr><td><b>Latitude:</b></td><td id="latitude">&nbsp;</td></tr>
+      		<tr><td><b>Longitude:</b></td><td id="longitude">&nbsp;</td></tr>
+    	</table>
+	</div>
+    <a href="javascript:" class="btn large" onclick="getLocation();">Get Location</a>
+    <a href="javascript:" class="btn large" onclick="watchLocation();">Start Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="stopLocation();">Stop Watching Location</a>
+	<div>
+
+	<!-- Network -->
+	<div id="info">
+		<h2>Network</h2>
+		<b>isReachable:</b> <span id="reachable_status">Press button to check</span><br>
+	</div>
+    <a href="javascript:" class="btn large" onclick="isReachable();">Call isReachable</a>
+
+        <!-- Display other content -->
+<!--	<div id="info">
+		<h2>Display Other Content</h2>
+	</div>
+    <a href="#" class="btn large" onclick="document.location='tel:5551212';return false;" >Call 411</a>
+    <a href="geo:0,0?q=11400 Burnet Rd, Austin, TX" class="btn large">Map IBM</a>
+    <a href="mailto:me@abc.com?subject=My Subject&body=This is the body.%0D%0ANew line." class="btn large">Send Mail</a>
+    <a href="sms:5121234567?body=The SMS message." class="btn large">Send SMS</a>
+    <a href="http://www.google.com" class="btn large">Load Web Site</a>
+    <a href="http://handle.library.cornell.edu/control/authBasic/authTest/" class="btn large">Basic Auth: test/this</a>
+    <a href="javascript:" class="btn large" onclick="childBrowserService('http://www.google.com/maps');">Load using Child Browser</a>
+    <a href="content://media/external/images/media" class="btn large">View image app</a>-->
+
+	<!-- Notifications -->
+	<div id="info">
+		<h2>Notifications and Dialogs</h2>
+	</div>
+    <!--<a href="javascript:" class="btn large" onclick="beep();">Beep</a>-->
+    <a href="javascript:" class="btn large" onclick="vibrate();">Vibrate</a>
+    <a href="javascript:" class="btn large" onclick="alertDialog('You pressed alert.', 'Alert Dialog', 'Continue');">Alert Dialog</a>
+    <a href="javascript:" class="btn large" onclick="confirmDialog('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe');">Confirm Dialog</a>
+<!--    <a href="javascript:" class="btn large" onclick="spinner();">Spinner Dialog</a>
+    <a href="javascript:" class="btn large" onclick="progress();">Progress Dialog</a>-->
+
+	<!-- Camera -->
+	<div id="info">
+		<h2>Camera</h2>
+		<b>Status:</b> <span id="camera_status"></span><br>
+  		<img style="width:120px;height:120px;visibility:hidden;display:none;" id="camera_image" src="" />
+	</div>
+    <a href="javascript:" class="btn large" onclick="getPicture();">Take Picture</a>
+    <a href="javascript:" class="btn large" onclick="getImage();">Select Image from Library</a>
+
+	<!-- Contacts -->
+    <div id="info">
+		<h2>Contacts</h2>
+		<b>Results:<b><br>
+		<span id="contacts_results">&nbsp;</span>
+	</div>
+    <a href="javascript:" class="btn large" onclick="getContacts('', true);">Get phone's contacts</a>
+
+	<!-- Audio -->
+<!--	<div id="info">
+		<h2>Audio</h2>
+		<table width="100%">
+		<tr><td><b>Status:</b></td><td id="audio_status">Stopped</td></tr>
+		<tr><td><b>Duration:</b></td><td id="audio_duration"></td></tr>
+		<tr><td><b>Position:</b></td><td id="audio_position"></td></tr>
+		</table>
+	</div>
+    <a href="javascript:" class="btn large" onclick="playAudio();">Play/Unpause Audio</a>
+    <a href="javascript:" class="btn large" onclick="pauseAudio();">Pause Playing Audio</a>
+    <a href="javascript:" class="btn large" onclick="stopAudio();">Stop Playing Audio</a>
+    <a href="javascript:" class="btn large" onclick="recordAudio();">Record Audio for 10 sec</a>
+    <a href="javascript:" class="btn large" onclick="playRecording();">Play/Unpause Recording</a>-->
+
+	<!-- File -->
+<!--	<div id="info">
+		<h2>File</h2>
+		<b>Results:<b><br>
+		<span id="file_results">&nbsp;</span>
+	</div>
+    <a href="javascript:" class="btn large" onclick="fileTests();">Read and Write Files</a>-->
+
+	<!-- Service -->
+<!--	<div id="info">
+		<h2>Custom Services and Plugins</h2>
+	</div>
+    <a href="javascript:" class="btn large" onclick="callHelloService('Mr. Smith');">Hello Service</a>
+    <a href="javascript:" class="btn large" onclick="callDemoService('Hello');">Echo Service</a>-->
+
+	<!-- HTML5 Database -->
+	<div id="info">
+		<h2>HTML5 Database</h2>
+		<b>Results:<b><br>
+		<span id="database_results"></span>
+	</div>
+    <a href="javascript:" class="btn large" onclick="callDatabase();">Database</a>
+
+	<!-- HTML5 Local Storage -->
+	<div id="info">
+  		<h2>Local Storage</h2>
+  		You have run this app <span id="count">an untold number of</span> time(s).
+	</div>
+	<script>
+  	if (!localStorage.pageLoadCount) {
+   		localStorage.pageLoadCount = 0;
+  	}
+  	localStorage.pageLoadCount = parseInt(localStorage.pageLoadCount) + 1;
+  	document.getElementById('count').textContent = localStorage.pageLoadCount;
+	</script>
+
+<!--	<br>
+	Just an input field: <input type="text" value="" />
+	
+    <a href="javascript:" class="btn large" onclick="navigator.app.backHistory();">Go back</a>
+        <br>&nbsp;
+        <br>&nbsp;-->
+	<br>&nbsp;
+    <a href="javascript:" class="btn large" onclick="navigator.app.exitApp();">Exit Application</a>
+    <br>&nbsp;
+  </body>
+</html>
