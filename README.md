@@ -42,3 +42,26 @@ Directory Structure
 	  |-license ....... the Apache Software License v2
 	  |-version ....... release version in plain text
 	  '-readme.md ..... release readme
+
+Harmattan Port Progress
+-----------------------
+
+Working so far:
+- Camera
+- Device
+- Events
+- Compass
+- Storage
+- Connection
+- Geolocation
+- Notification
+- Accelerometer
+
+Partially working
+- Contacts - only Contacts.find() is currently working.
+
+Not working:
+- File
+- Media
+- Capture
+
