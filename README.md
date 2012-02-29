@@ -47,6 +47,7 @@ Harmattan Port Progress
 -----------------------
 
 Working so far:
+
 - Camera
 - Device
 - Events
@@ -57,10 +58,12 @@ Working so far:
 - Notification
 - Accelerometer
 
-Partially working
+Partially working:
+
 - Contacts - only Contacts.find() is currently working.
 
 Not working:
+
 - File
 - Media
 - Capture
